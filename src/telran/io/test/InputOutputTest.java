@@ -35,7 +35,7 @@ class InputOutputTest {
 		System.out.println(dir1.getAbsolutePath());
 	}
 	
-	
+
 	@Test
 	@Disabled
 	void testFiles() {
