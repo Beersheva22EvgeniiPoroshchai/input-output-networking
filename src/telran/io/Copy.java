@@ -28,6 +28,9 @@ public void copyRun() throws Exception{
  	if (!overwrite && Files.exists(Path.of(destFilePath))) {
  		throw new Exception (destFilePath + "can't be overwritten");
  	}
+ 	if (!Files.exists(Path.of(srcFilePath))) {
+ 		throw new Exception ("File " + srcFilePath + "not found");
+ 	}
 	Instant time = Instant.now();
 	long size = copy();
 	DisplayResult dispRes = getDisplayResult (ChronoUnit.MILLIS.between(time, Instant.now()), size);
