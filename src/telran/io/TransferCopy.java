@@ -15,18 +15,22 @@ public class TransferCopy extends Copy {
 	}
 
 	@Override
-	long copy() throws IOException {
-		try (InputStream inputStream = new FileInputStream(srcFilePath);
-				OutputStream outputStream = new FileOutputStream(destFilePath);) {
-			inputStream.transferTo(outputStream);
+	public long copy() {
+		long res;
+		try (InputStream input = new FileInputStream(srcFilePath);
+				OutputStream output = new FileOutputStream(destFilePath)) {
+			res = input.transferTo(output);
+		} catch(Exception e) {
+			throw new RuntimeException(e.getMessage());
 		}
-		return Files.size(Path.of(destFilePath));
+		
+		return res;
 	}
+	
 
 	@Override
-	DisplayResult getDisplayResult(long copyTime, long fileSize) {
-		DisplayResult res = new DisplayResult(copyTime, fileSize);
-		return res;
+	public DisplayResult getDisplayResult(long copyTime, long fileSize) {
+		return new DisplayResult(fileSize, copyTime);
 	}
 
 }

@@ -8,37 +8,39 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+
+
 public class BufferCopy extends Copy {
-private long bufferSize;
+	private int bufferSize;
 
-public BufferCopy(String srcFilePath, String destFilePath, boolean overwrite, long bufferSize) {
-	super(srcFilePath, destFilePath, overwrite);
-	this.bufferSize = bufferSize;
-}	
-
+	public BufferCopy(String srcFilePath, String destFilePath, boolean overwrite, int bufferSize) {
+		super(srcFilePath, destFilePath, overwrite);
+		this.bufferSize = bufferSize;
+	}
 
 	@Override
-	public long copy() throws IOException {
-		try(InputStream inputStream = new FileInputStream(srcFilePath); 
-			OutputStream outputStream = new FileOutputStream(destFilePath);) {
-			byte[] buffer = new byte [(int) bufferSize];
-			int length = inputStream.read(buffer);
+	public long copy() {
+		byte[] buffer = new byte[bufferSize];
+		long res = 0L;
+		try (InputStream input = new FileInputStream(srcFilePath);
+				OutputStream output = new FileOutputStream(destFilePath)) {
+			int length = input.read(buffer);
 			while (length > 0) {
-				outputStream.write(buffer, 0, length);
-				length = inputStream.read(buffer);
+				output.write(buffer, 0, length);
+				res += length;
+				length = input.read(buffer);
 			}
-			
-			return Files.size(Path.of(destFilePath));
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
 		}
+
+		return res;
 	}
 
 	@Override
-	DisplayResult getDisplayResult(long copyTime, long fileSize) {
-	DisplayResultBuffer res = new DisplayResultBuffer(copyTime, fileSize, bufferSize);
-	return res;
-		
+	public DisplayResult getDisplayResult(long copyTime, long fileSize) {
+		return new DisplayResultBuffer(fileSize, copyTime, bufferSize);
 	}
-
-
-
 }
+
+

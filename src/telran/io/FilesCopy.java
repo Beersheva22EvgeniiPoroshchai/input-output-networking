@@ -5,27 +5,30 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 public class FilesCopy extends Copy {
 
 	public FilesCopy(String srcFilePath, String destFilePath, boolean overwrite) {
 		super(srcFilePath, destFilePath, overwrite);
-		
 	}
 
 	@Override
-	long copy() throws IOException {
-		try (OutputStream outputStream = new FileOutputStream (destFilePath);) {
-			Files.copy(Path.of(srcFilePath), outputStream);
+	public long copy() {
+		Path src = Path.of(srcFilePath);
+		Path dest = Path.of(destFilePath);
+		try {
+			Files.copy(src, dest, StandardCopyOption.REPLACE_EXISTING);
+			return Files.size(src);
+		} catch (IOException e) {
+			throw new RuntimeException(e.getMessage());
 		}
 		
-		return Files.size(Path.of(destFilePath));
 	}
 
 	@Override
-	DisplayResult getDisplayResult(long copyTime, long fileSize) {
-		DisplayResult res = new DisplayResult(copyTime, fileSize);
-		return res;
+	public DisplayResult getDisplayResult(long copyTime, long fileSize) {
+		return new DisplayResult(fileSize, copyTime);
 	}
 
 }
