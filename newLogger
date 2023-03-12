@@ -1,0 +1,5 @@
+2023-03-12T22:43:49.920468 newLogger DEBUG DEBUG message was sent to server
+2023-03-12T22:43:49.920537 newLogger ERROR An ERROR message
+2023-03-12T22:43:49.920566 newLogger WARN A WARNING message
+2023-03-12T22:43:49.920617 newLogger INFO This is a INFO level message
+2023-03-12T22:43:49.920638 newLogger TRACE This is a TRACE level message
