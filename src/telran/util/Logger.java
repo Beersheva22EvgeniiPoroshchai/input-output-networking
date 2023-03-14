@@ -19,48 +19,50 @@ public void setLevel(Level level) {
 	this.level = level;
 }
 
-public boolean checkLevel (Level level, Level LevelbyParam) {
-	return level.compareTo(LevelbyParam) < 1;
+public boolean checkLevel (Level level, Level LevelByParam) {
+	return level.compareTo(LevelByParam) < 1;
 }
 
 
 public void error(String message) {
 	if (checkLevel(level, Level.ERROR)) {
-		LoggerRecord error = new LoggerRecord(Instant.now(), ZoneId.systemDefault().toString(),
-			Level.ERROR, name, message);
+		LoggerRecord error = createNewLoggerRecord(message, Level.ERROR);
 	handler.publish(error);
 	}
 	
 }
+
 public void warn(String message) {
 	if (checkLevel(level, Level.WARN)) {
-		LoggerRecord warn = new LoggerRecord(Instant.now(), ZoneId.systemDefault().toString(),
-				Level.WARN, name, message);
+		LoggerRecord warn = createNewLoggerRecord(message, Level.WARN);
 		handler.publish(warn);
 	}
 }
 
 public void info(String message) {
 	if (checkLevel(level, Level.INFO)) {
-		LoggerRecord info = new LoggerRecord(Instant.now(), ZoneId.systemDefault().toString(),
-				Level.INFO, name, message);
+		LoggerRecord info = createNewLoggerRecord(message, Level.INFO);
 		handler.publish(info);
 	}
 }
 
 public void debug(String message) {
 	if (checkLevel(level, Level.DEBUG)) {
-		LoggerRecord debug = new LoggerRecord(Instant.now(), ZoneId.systemDefault().toString(),
-				Level.DEBUG, name, message);
+		LoggerRecord debug = createNewLoggerRecord(message, Level.DEBUG);
 		handler.publish(debug);
 	}
 }
 
 public void trace(String message) {
 	if (checkLevel(level, Level.TRACE)) {
-		LoggerRecord trace = new LoggerRecord(Instant.now(), ZoneId.systemDefault().toString(),
-				Level.TRACE, name, message);
+		LoggerRecord trace = createNewLoggerRecord(message, Level.TRACE);
 		handler.publish(trace);
 		}
 	}
+
+private LoggerRecord createNewLoggerRecord(String message, Level level) {
+	return new LoggerRecord(Instant.now(), ZoneId.systemDefault().toString(),
+		level, name, message);
+
+}
 }
