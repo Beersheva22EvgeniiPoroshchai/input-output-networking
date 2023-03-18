@@ -29,7 +29,6 @@ public void error(String message) {
 		LoggerRecord error = createNewLoggerRecord(message, Level.ERROR);
 	handler.publish(error);
 	}
-	
 }
 
 public void warn(String message) {
