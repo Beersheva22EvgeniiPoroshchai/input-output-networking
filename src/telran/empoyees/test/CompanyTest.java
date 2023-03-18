@@ -2,81 +2,117 @@ package telran.empoyees.test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.*;
-import java.time.*;
-import java.util.*;
+import java.time.LocalDate;
+import java.util.Arrays;
+
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
 import telran.employees.*;
-
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class CompanyTest {
-	
-	String fileName = "company.data";
-	
-	Company company = new CompanyImplementation();
-	
-	Employee joe = new Employee(801001, "Joe", LocalDate.of(1981, 12, 07), "Lawers", 13400);
-	Employee rohn = new Employee(801002, "Rohn", LocalDate.of(1992, 01, 01), "Developers", 19300);
-	Employee anel = new Employee(801003, "Anel", LocalDate.of(1997, 11, 28), "Lawers", 17000);
-	Employee tracy = new Employee(801004, "Tracy", LocalDate.of(1985, 11, 30), "Developers", 18900);
-	Employee steven = new Employee(801005, "Steven", LocalDate.of(1978, 04, 22), "Developers", 22000);
-
-
+private static final long ID1 = 123;
+private static final int MONTH1 = 1;
+private static final String DEPARTMENT1 = "department1";
+private static final int SALARY1 = 1000;
+private static final long ID2 = 124;
+private static final String DEPARTMENT2 = "department2";
+private static final int SALARY2 = 2000;
+private static final LocalDate BIRTH2 = LocalDate.of(2000, MONTH1, 1);
+private static final int MONTH2 = 2;
+private static final int SALARY3 = 3000;
+private static final long ID3 = 125;
+private static final int SALARY4 = 4000;
+private static final long ID4 = 126;
+private static final long ID10 = 100000;
+private static final String FILE_NAME = "test.data";
+Employee empl1 = new Employee(ID1, "name", LocalDate.of(2000, MONTH1, 1), DEPARTMENT1, SALARY1);
+Employee empl2 = new Employee(ID2, "name", LocalDate.of(2000, MONTH1, 1), DEPARTMENT2, SALARY2);
+Employee empl3 = new Employee(ID3, "name", LocalDate.of(2000, MONTH2, 1), DEPARTMENT1, SALARY3);
+Employee empl4 = new Employee(ID4, "name", LocalDate.of(2000, MONTH1, 1), DEPARTMENT2, SALARY4);
+Employee[] employees = {empl1, empl2, empl3, empl4};
+Company company = new CompanyImplementation();
 	@BeforeEach
-	void setUp() {
-		company.addEmployer(joe);
-		company.addEmployer(rohn);
-		company.addEmployer(anel);
+	void setUp() throws Exception {
+		company = new CompanyImplementation();
+		for(Employee empl: employees) {
+			company.addEmployer(empl);
+		}
 	}
 
 	@Test
-	void AddTest() throws FileNotFoundException, IOException {
-		assertTrue(company.addEmployer(tracy)); 
-		assertTrue(company.addEmployer(steven)); 
-		assertFalse(company.addEmployer(rohn)); 
+	void addEmployeeTest() {
+		Employee newEmployee = new Employee(ID10, DEPARTMENT2, BIRTH2, DEPARTMENT1, SALARY1);
+		assertTrue(company.addEmployer(newEmployee));
+		assertFalse(company.addEmployer(newEmployee));
 	}
-	
 	@Test
-	void removeTest() {
-		assertEquals(joe, company.removeEmployee(801001));
-		assertEquals(null, company.removeEmployee(801001));
-		List<Employee> employees = company.getAllEmployees();
-		assertEquals(2, employees.size());
+	void removeEmployeeTest() {
+		assertEquals(empl1, company.removeEmployee(ID1));
+		assertNull(company.removeEmployee(ID1));
+		runTest(new Employee[] {empl2, empl3, empl4});
+		
 	}
-	
 	@Test
-	void getEmployeesBySalary() {
-		company.addEmployer(tracy);
-		company.addEmployer(steven);
-		List<Employee> employees = company.getEmployeesBysalary(17000, 19300);
-		assertEquals(3, employees.size());
+	void employeesByMonthTest() {
+		assertTrue(company.getEmployeesByMonthBirth(20).isEmpty());
+		Employee[] expected = {empl1, empl2, empl4};
+		Employee[] actual = company.getEmployeesByMonthBirth(MONTH1).toArray(Employee[]::new);
+		Arrays.sort(actual);
+		assertArrayEquals(expected, actual);
+		company.removeEmployee(ID1);
+		company.removeEmployee(ID2);
+		company.removeEmployee(ID4);
+		assertTrue(company.getEmployeesByMonthBirth(MONTH1).isEmpty());
 	}
-	
 	@Test
-	void getEmployeesByMonthTest() {
-		company.addEmployer(tracy);
-		company.addEmployer(steven);
-		List<Employee> employees = company.getEmployeesByMonthBirth(11);
-		assertEquals(2, employees.size());
+	void employeesByDepartmentTest() {
+		assertTrue(company.getEmployeesByDepartment("gggggg").isEmpty());
+		Employee[] expected = {empl2, empl4};
+		Employee[] actual = company.getEmployeesByDepartment(DEPARTMENT2).toArray(Employee[]::new);
+		Arrays.sort(actual);
+		assertArrayEquals(expected, actual);
+		company.removeEmployee(ID2);
+		company.removeEmployee(ID4);
+		assertTrue(company.getEmployeesByDepartment(DEPARTMENT2).isEmpty());
+		
 	}
-	
 	@Test
-	void getEmployeesByDepartmentTest() {
-		company.addEmployer(tracy);
-		company.addEmployer(steven);
-		List<Employee> employees = company.getEmployeesByDepartment("Developers");
-		assertEquals(3, employees.size());
-}
+	void employeesBySalaryTest() {
+		assertTrue(company.getEmployeesBySalary(100000000,100000100).isEmpty());
+		Employee[] expected = {empl1, empl2, empl3};
+		Employee[] actual = company.getEmployeesBySalary(SALARY1, SALARY3).toArray(Employee[]::new);
+		Arrays.sort(actual);
+		assertArrayEquals(expected, actual);
+		company.removeEmployee(ID1);
+		company.removeEmployee(ID2);
+		company.removeEmployee(ID3);
+		assertTrue(company.getEmployeesBySalary(SALARY1, SALARY3).isEmpty());
+	}
 
-	@Test
-	void saveRestoreTest() {
-		company.addEmployer(tracy);
-		company.addEmployer(steven);
-		company.save(fileName);
-		company.restore(fileName);
-		company.forEach(p -> System.out.printf("%d, %s, %s,%s,%d\r", 
-				p.getId(), p.getName(), p.getBirthDate().toString(), p.getDepartment(), p.getSalary()));
-
+	private void runTest(Employee[] expected) {
+		Employee[]actual = company.getAllEmployees().toArray(Employee[]::new);
+		Arrays.sort(actual);
+		assertArrayEquals(expected, actual);
+		
 	}
+	
+	@Test
+	@Order(1)
+	void saveTest() {
+		company.save(FILE_NAME);
+	}
+	@Test
+	@Order(2)
+	void restoreTest() {
+		Company company2 = new CompanyImplementation();
+		company2.restore(FILE_NAME);
+		assertIterableEquals(company, company2);
+	}
+	
+	
 	
 }
