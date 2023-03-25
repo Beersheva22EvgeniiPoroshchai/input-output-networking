@@ -23,7 +23,6 @@ public class TcpServer implements Runnable {
 	}
 }
 
-
 	public TcpServer(Protocol protocol, int port) throws Exception {
 		super();
 		this.protocol = protocol;

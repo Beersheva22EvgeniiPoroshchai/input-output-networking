@@ -15,7 +15,6 @@ public class TcpClient implements NetworkClient {
 		
 	}
 	
-	
 	@Override
 	public void close() throws IOException {
 		socket.close();
@@ -25,18 +24,24 @@ public class TcpClient implements NetworkClient {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T send(String type, Serializable requestData) {
-		T response = null;
 		Request request = new Request (type, requestData);
+		T res = null;
 		try {
 			output.writeObject(request);
-			response = (T) input.readObject();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			System.out.println (e.toString());
+			Response response = (Response) input.readObject();
+			if (response.code != ResponseCode.OK) {
+				throw new Exception (response.data.toString());
+			}
+			res = (T) response.data;
+		} catch (Exception e) {
+			throw new RuntimeException (e.getMessage());
 		}
-			return response;
+		return res;
 	
 	}
-
 }
+
+
+
+
+

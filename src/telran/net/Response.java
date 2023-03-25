@@ -14,7 +14,5 @@ public class Response implements Serializable {
 		this.data = data;
 	}
 	
-	
-	
 
 }

@@ -1,41 +1,26 @@
 package telran.net;
+import java.io.Serializable;
+
+import telran.net.*;
 
 public class ProtocolImplementation implements Protocol {
 
 	
 	@Override
 	public Response getResponse(Request request) {
-		Response response = switch (request.type) {
-		case "reverse" -> stringToReverse (request);
-		case "length" -> stringToLength (request);
-		default -> new Response (ResponseCode.WRONG_REQUEST, request);
-	};
 		
-		return response;
+		return switch(request.type) {
+		case "reverse" -> reverse(request.data);
+		case "length" -> length(request.data);
+		default -> new Response(ResponseCode.WRONG_REQUEST, request.type + " wrong request");
+		};
 	}
-
-	private Response stringToLength(Request request) {
-		Response response = new Response(null, request.data);
-		try {
-		response.data = request.data.toString().length() + "";
-		response.code = ResponseCode.OK;
-		} catch (Exception e) {
-			response.code = ResponseCode.WRONG_DATA;
-		}
-		return response;
-	}
-
-	private Response stringToReverse(Request request) {
-		Response response = new Response(null, request.data);
-		try {
-			
+	private Response length(Serializable data) {
 		
-		response.data = new StringBuilder(request.data.toString()).reverse();
-		response.code = ResponseCode.OK;
-		} catch (Exception e) {
-			response.code = ResponseCode.WRONG_DATA;
-		}
-		return response;
+		return new Response(ResponseCode.OK, data.toString().length());
 	}
-
+	Response reverse (Serializable data) {
+		Serializable responseData = new StringBuilder(data.toString()).reverse().toString();
+		return new Response(ResponseCode.OK, responseData);
+	}
 }
