@@ -2,16 +2,21 @@ package telran.empoyees.test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Arrays;
 
+import org.junit.jupiter.api.AfterEach;
+
 import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import telran.employees.*;
+
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class CompanyTest {
 private static final long ID1 = 123;
@@ -34,15 +39,17 @@ Employee empl2 = new Employee(ID2, "name", LocalDate.of(2000, MONTH1, 1), DEPART
 Employee empl3 = new Employee(ID3, "name", LocalDate.of(2000, MONTH2, 1), DEPARTMENT1, SALARY3);
 Employee empl4 = new Employee(ID4, "name", LocalDate.of(2000, MONTH1, 1), DEPARTMENT2, SALARY4);
 Employee[] employees = {empl1, empl2, empl3, empl4};
-Company company = new CompanyImplementation();
+
+	static NetworkCompanyImplem company;
+
+	
 	@BeforeEach
 	void setUp() throws Exception {
-		company = new CompanyImplementation();
-		for(Employee empl: employees) {
-			company.addEmployer(empl);
-		}
-	}
-
+	company = new NetworkCompanyImplem();
+	company.getAllEmployees().forEach(employee -> company.removeEmployee(employee.getId()));
+	Arrays.stream(employees).forEach(employee -> company.addEmployer(employee));
+}	
+	
 	@Test
 	void addEmployeeTest() {
 		Employee newEmployee = new Employee(ID10, DEPARTMENT2, BIRTH2, DEPARTMENT1, SALARY1);
@@ -93,14 +100,12 @@ Company company = new CompanyImplementation();
 		assertTrue(company.getEmployeesBySalary(SALARY1, SALARY3).isEmpty());
 	}
 
+	
 	private void runTest(Employee[] expected) {
 		Employee[]actual = company.getAllEmployees().toArray(Employee[]::new);
 		Arrays.sort(actual);
 		assertArrayEquals(expected, actual);
-		
 	}
-	
-	@Test
 	@Order(1)
 	void saveTest() {
 		company.save(FILE_NAME);
@@ -113,6 +118,9 @@ Company company = new CompanyImplementation();
 		assertIterableEquals(company, company2);
 	}
 	
-	
+	@AfterEach
+	void closeConnect() throws IOException {
+		company.close();
+	}
 	
 }
