@@ -1,5 +1,6 @@
 package telran.employees;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
@@ -9,20 +10,17 @@ import telran.net.TcpClient;
 import telran.net.UdpClient;
 
 
-public class NetworkCompanyImplem implements Company {
+public class NetworkCompanyImplem implements Company, Closeable {
 
 	private static final long serialVersionUID = 1L;
-		
 	NetworkClient newClient;
 
-	public NetworkCompanyImplem() {
-		try {
-			newClient = new TcpClient("localhost", NetworkCompanyTcpApp.PORT);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
+	
+	public NetworkCompanyImplem(NetworkClient newClient) {
+		this.newClient = newClient;
 	}
-
+	
+			
 	@Override
 	public Iterator<Employee> iterator() {
 	return getAllEmployees().iterator();
@@ -40,7 +38,7 @@ public class NetworkCompanyImplem implements Company {
 
 	@Override
 	public List<Employee> getAllEmployees() {
-		return newClient.send("getAllEmployees", new ArrayList<>());   
+		return newClient.send("getAllEmployees", "");   
 	}
 
 	@Override
